@@ -1,0 +1,54 @@
+#lang racket
+; Auther: Kazon Wilson
+; Class: CSCI 3210
+; Assignement: Project 4
+
+(define (sphereVolume radius)
+   (* (* (/ 4 3) radius radius radius)3.14))
+
+(define (power a b)
+  (if (= b 0)
+      1  ; If raised to the 0th power, return 1.
+  (if (= b 1)
+      a  ; If raised to the 1st power, return a.
+      (* a(power a (- b 1))))))  ; Otherwise, multiply a by itself b amount of times.
+
+(define (countZero list)
+  (define count 0)  ; Initialize count as 0.
+  (cond
+    [(not (list? list)) count]  ; If not a list, return 0.
+    [(null? list) count]        ; If the list is empty, return count.
+    [(= (car list) 0)(+ (countZero (cdr list)) (+ count 1))]  ; If current element is 0, increment the counter and get the next element.
+    [else (countZero (cdr list))]  ; If the current element in the list is not 0, get the next element
+    ))
+
+(define (reverse list)
+  (define (reverse-helper list acc) ; acc = accumulator.
+    (if (null? list)
+      acc  ; If the list is empty, return the new list.
+      (reverse-helper (cdr list) (cons (car list) acc)))) ; Append the head of the list to the new list.
+  (reverse-helper list '()))  ; Start helper function with an empty list.
+
+(define (findEnds list)
+  (if (null? list)  ; If list is empty
+      0             ; Return 0 if list is empty
+      (let loop ((list (cdr list))  ; list = tail
+                 (max  (car list))  ; max = head
+                 (min (car list)))  ; min = head
+        (cond ((null? list) (cons max (cons min '())))  ; If the list is empty, return '(max min)
+              ((> (car list) max)  ; Current element > max
+               (loop (cdr list) (car list) min)) ; Max = current element, min = min
+              ((< (car list) min)  ; Current element < min
+               (loop (cdr list) max (car list))) ; Min = current element, max = max
+              (else
+               (loop (cdr list) max min))))))  ; Current element != max or min, get next element.
+    
+(define (replace atom1 atom2 list)
+  (cond
+    [(null? list) '()]  ; If the list is empty, return '()
+    ; If the current element is a list, increment through the list, replace atom1 wtih 2, then return a new list and get the next element.
+    [(list? (car list)) (cons (replace atom1 atom2 (car list)) (replace atom1 atom2 (cdr list)))]
+    [(= (car list) atom1) (cons atom2 (replace atom1 atom2 (cdr list)))]  ; If the current element = atom1, append atom2 to the new list instead.
+    [else (cons (car list) (replace atom1 atom2 (cdr list)))]  ; If the current element is not a list or atom1, append it to the new list.
+    ))
+ 
